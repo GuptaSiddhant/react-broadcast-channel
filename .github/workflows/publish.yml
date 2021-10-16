@@ -1,5 +1,7 @@
-on: push
-
+on:
+  push:
+    tags:
+      - "*"
 jobs:
   publish:
     runs-on: ubuntu-latest

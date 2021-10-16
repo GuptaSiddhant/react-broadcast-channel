@@ -1,0 +1,67 @@
+{
+  "name": "react-broadcast-channel",
+  "version": "0.1.0",
+  "description": "React hooks for accessing web broadcast channel.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "node": "./dist/index.cjs",
+      "typing": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "bash ./scripts/build.sh",
+    "start": "tsc --watch --noEmit --emitDeclarationOnly false",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GuptaSiddhant/react-broadcast-channel.git"
+  },
+  "keywords": [
+    "react",
+    "hook",
+    "use",
+    "broadcast",
+    "channel",
+    "share",
+    "browser",
+    "state"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GuptaSiddhant/react-broadcast-channel/issues"
+  },
+  "homepage": "https://github.com/GuptaSiddhant/react-broadcast-channel#readme",
+  "devDependencies": {
+    "@types/node": "^16.11.0",
+    "@types/react": "^17.0.30",
+    "esbuild": "^0.13.7",
+    "react": "^17.0.2",
+    "typescript": "^4.4.4"
+  },
+  "peerDependencies": {
+    "react": "^16.8 || 17"
+  },
+  "optionalDependencies": {
+    "@types/node": "12 || 14 || 16",
+    "@types/react": "^16.8 || 17",
+    "broadcastchannel-polyfill": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": false
+    }
+  }
+}

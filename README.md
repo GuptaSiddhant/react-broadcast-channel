@@ -8,6 +8,22 @@ _To use the hooks in browsers that do not support Broadcast Channel API, install
 
 > For typescript users: The default data-type for all messages are set to `string` but can be easily overridden by explicitly passing type parameter to the hook(s). Example for numeric data: `useBroadcastChannel<number>("count", (e) => console.log(e.data));`
 
+## Setup
+
+Package available at [NPM](https://www.npmjs.com/package/use-broadcast-channel).
+
+- NPM
+
+  ```shell
+  npm install use-broadcast-channel
+  ```
+
+- Yarn
+
+  ```shell
+  yarn add use-broadcast-channel
+  ```
+
 ## API
 
 The package exports multiple hooks for different use-cases.

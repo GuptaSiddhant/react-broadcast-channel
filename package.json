@@ -31,12 +31,14 @@
   "keywords": [
     "react",
     "hook",
+    "hooks",
     "use",
     "broadcast",
     "channel",
     "share",
     "browser",
-    "state"
+    "state",
+    "tabs"
   ],
   "author": "",
   "license": "MIT",
@@ -52,14 +54,21 @@
     "typescript": "^4.4.4"
   },
   "peerDependencies": {
-    "react": "^16.8 || 17"
-  },
-  "optionalDependencies": {
     "@types/node": "12 || 14 || 16",
     "@types/react": "^16.8 || 17",
-    "broadcastchannel-polyfill": "^1.0.0"
+    "broadcastchannel-polyfill": "^1.0.0",
+    "react": "^16.8 || 17"
   },
   "peerDependenciesMeta": {
+    "@types/node": {
+      "optional": true
+    },
+    "@types/react": {
+      "optional": true
+    },
+    "broadcastchannel-polyfill": {
+      "optional": true
+    },
     "react": {
       "optional": false
     }

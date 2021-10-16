@@ -1,4 +1,4 @@
-# React Broadcast Channel
+# use-broadcast-channel (React-hooks)
 
 > The **Broadcast Channel API** allows basic communication between browsing contexts (that is, windows, tabs, frames, or iframes) and workers on the same origin. _-[MDN](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API)_
 
@@ -22,7 +22,7 @@ This is base hook exported by the package as all other exported hooks depends on
 Only subscribe for events broadcasted on a particular channel.
 
 ```tsx
-import { useBroadcastChannel } from "react-broadcast-channel";
+import { useBroadcastChannel } from "use-broadcast-channel";
 
 function App() {
   useBroadcastChannel("userId", (e) => alert(e.data));
@@ -35,7 +35,7 @@ function App() {
 Only broadcast (post) event on a particular channel.
 
 ```tsx
-import { useBroadcastChannel } from "react-broadcast-channel";
+import { useBroadcastChannel } from "use-broadcast-channel";
 
 function App() {
   const postUserId = useBroadcastChannel("userId");
@@ -48,7 +48,7 @@ function App() {
 Both broadcast (post) event and subscribe for events broadcasted on a particular channel.
 
 ```tsx
-import { useBroadcastChannel } from "react-broadcast-channel";
+import { useBroadcastChannel } from "use-broadcast-channel";
 
 function App() {
   const postUserId = useBroadcastChannel("userId", (e) => alert(e.data));
@@ -61,7 +61,7 @@ function App() {
 React hook to manage state across browser windows/tabs/frames. It has a similar signature as `React.useState`. It used `useBroadcastChannel` under the hood.
 
 ```tsx
-import { useBroadcastState } from "react-broadcast-channel";
+import { useBroadcastState } from "use-broadcast-channel";
 
 function App() {
   const [count, setCount] = useBroadcastState("count", 0);

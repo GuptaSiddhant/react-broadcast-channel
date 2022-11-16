@@ -1,0 +1,9 @@
+  {
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "removeComments": true /* Disable emitting comments. */,
+    },
+    "exclude": [
+      "test/*.ts",
+    ]
+  }

@@ -20,4 +20,4 @@ esbuild ./src/index.ts \
     --minify
 
 # Generate .d.ts
-tsc
+tsc --project tsconfig.build.json

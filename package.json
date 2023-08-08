@@ -48,6 +48,7 @@
   },
   "homepage": "https://github.com/GuptaSiddhant/react-broadcast-channel#readme",
   "devDependencies": {
+    "@babel/core": "^7.22.10",
     "@babel/preset-env": "^7.22.10",
     "@babel/preset-typescript": "^7.22.5",
     "@testing-library/react": "^14.0.0",

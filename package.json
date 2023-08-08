@@ -63,9 +63,9 @@
   },
   "peerDependencies": {
     "@types/node": "16 || 18 || 20",
-    "@types/react": "^16.8 || 17",
+    "@types/react": "^16.8 || 17 || 18",
     "broadcastchannel-polyfill": "^1.0.0",
-    "react": "^16.8 || 17"
+    "react": "^16.8 || 17 || 18"
   },
   "peerDependenciesMeta": {
     "@types/node": {

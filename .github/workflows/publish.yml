@@ -9,9 +9,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: 20
           cache: yarn
-      - run: yarn install
+      - run: yarn install --frozen-lockfile
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}

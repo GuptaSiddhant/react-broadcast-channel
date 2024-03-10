@@ -1,5 +1,23 @@
-import { useEffect, useCallback, useRef, useState } from "react";
-import type { Dispatch, SetStateAction, MutableRefObject } from "react";
+import {
+  useEffect,
+  useCallback,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from "react";
+
+const NOOP = () => {};
+const NOOP_Subscribe = () => NOOP;
+const nullFn = () => null;
+
+export type BroadcastChannelData =
+  | string
+  | number
+  | boolean
+  | Record<string, unknown>
+  | undefined
+  | null;
 
 /**
  * React hook to create and manage a Broadcast Channel across multiple browser windows.
@@ -21,26 +39,21 @@ import type { Dispatch, SetStateAction, MutableRefObject } from "react";
  * Works in browser that support Broadcast Channel API natively. See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API#browser_compatibility).
  * To support other browsers, install and use [broadcastchannel-polyfill](https://www.npmjs.com/package/broadcastchannel-polyfill).
  */
-export function useBroadcastChannel<T = string>(
+export function useBroadcastChannel<T extends BroadcastChannelData = string>(
   channelName: string,
   handleMessage?: (event: MessageEvent) => void,
   handleMessageError?: (event: MessageEvent) => void
 ): (data: T) => void {
-  const channelRef = useRef(
-    typeof window !== "undefined" && "BroadcastChannel" in window
-      ? new BroadcastChannel(channelName + "-channel")
-      : null
+  const channel = useSyncExternalStore(
+    NOOP_Subscribe,
+    createBroadcastChannelGenerator(channelName + "-channel"),
+    nullFn
   );
 
-  useChannelEventListener(channelRef, "message", handleMessage);
-  useChannelEventListener(channelRef, "messageerror", handleMessageError);
+  useChannelEventListener(channel, "message", handleMessage);
+  useChannelEventListener(channel, "messageerror", handleMessageError);
 
-  return useCallback(
-    (data: T) => {
-      channelRef?.current?.postMessage(data);
-    },
-    [channelRef]
-  );
+  return useCallback((data: T) => channel?.postMessage(data), [channel]);
 }
 
 /**
@@ -68,29 +81,54 @@ export function useBroadcastChannel<T = string>(
  * Works in browser that support Broadcast Channel API natively. See [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API#browser_compatibility).
  * To support other browsers, install and use [broadcastchannel-polyfill](https://www.npmjs.com/package/broadcastchannel-polyfill).
  */
-export function useBroadcastState<T = string>(
+export function useBroadcastState<T extends BroadcastChannelData = string>(
   channelName: string,
   initialState: T
-): [T, Dispatch<SetStateAction<T>>] {
+): [T, React.Dispatch<React.SetStateAction<T>>, boolean] {
+  const [isPending, startTransition] = useTransition();
   const [state, setState] = useState<T>(initialState);
-  const setter = useBroadcastChannel<T>(channelName, (ev) => setState(ev.data));
-  useEffect(() => setter(state), [setter, state]);
-  return [state, setState];
+  const broadcast = useBroadcastChannel<T>(channelName, (ev) =>
+    setState(ev.data)
+  );
+
+  const updateState: React.Dispatch<React.SetStateAction<T>> = useCallback(
+    (input) => {
+      setState((prev) => {
+        const newState = typeof input === "function" ? input(prev) : input;
+        startTransition(() => broadcast(newState));
+        return newState;
+      });
+    },
+    [broadcast]
+  );
+
+  return [state, updateState, isPending];
 }
 
 // Helpers
 
 /** Hook to subscribe/unsubscribe from channel events. */
 function useChannelEventListener<K extends keyof BroadcastChannelEventMap>(
-  channelRef: MutableRefObject<BroadcastChannel | null>,
+  channel: BroadcastChannel | null,
   event: K,
   handler: (e: BroadcastChannelEventMap[K]) => void = () => {}
 ) {
+  const callbackRef = useRef(handler);
+  if (callbackRef.current !== handler) {
+    callbackRef.current = handler;
+  }
+
   useEffect(() => {
-    const channel = channelRef.current;
     if (channel) {
-      channel.addEventListener(event, handler);
-      return () => channel.removeEventListener(event, handler);
+      channel.addEventListener(event, callbackRef.current);
+      return () => channel.removeEventListener(event, callbackRef.current);
     }
-  }, [channelRef, event, handler]);
+  }, [channel, event]);
+}
+
+function createBroadcastChannelGenerator(channelName: string) {
+  return () =>
+    typeof window !== "undefined" && "BroadcastChannel" in window
+      ? new BroadcastChannel(channelName + "-channel")
+      : null;
 }

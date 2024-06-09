@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useCallback,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  useTransition,
-} from "react";
+import * as React from "react";
 
 const NOOP = () => {};
 const NOOP_Subscribe = () => NOOP;
@@ -44,16 +37,20 @@ export function useBroadcastChannel<T extends BroadcastChannelData = string>(
   handleMessage?: (event: MessageEvent) => void,
   handleMessageError?: (event: MessageEvent) => void
 ): (data: T) => void {
-  const channel = useSyncExternalStore(
+  const getSnapshot = React.useMemo(
+    () => createBroadcastChannelGenerator(channelName + "-channel"),
+    [channelName]
+  );
+  const channel = React.useSyncExternalStore(
     NOOP_Subscribe,
-    createBroadcastChannelGenerator(channelName + "-channel"),
+    getSnapshot,
     nullFn
   );
 
   useChannelEventListener(channel, "message", handleMessage);
   useChannelEventListener(channel, "messageerror", handleMessageError);
 
-  return useCallback((data: T) => channel?.postMessage(data), [channel]);
+  return React.useCallback((data: T) => channel?.postMessage(data), [channel]);
 }
 
 /**
@@ -85,22 +82,23 @@ export function useBroadcastState<T extends BroadcastChannelData = string>(
   channelName: string,
   initialState: T
 ): [T, React.Dispatch<React.SetStateAction<T>>, boolean] {
-  const [isPending, startTransition] = useTransition();
-  const [state, setState] = useState<T>(initialState);
+  const [isPending, startTransition] = React.useTransition();
+  const [state, setState] = React.useState<T>(initialState);
   const broadcast = useBroadcastChannel<T>(channelName, (ev) =>
     setState(ev.data)
   );
 
-  const updateState: React.Dispatch<React.SetStateAction<T>> = useCallback(
-    (input) => {
-      setState((prev) => {
-        const newState = typeof input === "function" ? input(prev) : input;
-        startTransition(() => broadcast(newState));
-        return newState;
-      });
-    },
-    [broadcast]
-  );
+  const updateState: React.Dispatch<React.SetStateAction<T>> =
+    React.useCallback(
+      (input) => {
+        setState((prev) => {
+          const newState = typeof input === "function" ? input(prev) : input;
+          startTransition(() => broadcast(newState));
+          return newState;
+        });
+      },
+      [broadcast]
+    );
 
   return [state, updateState, isPending];
 }
@@ -113,17 +111,24 @@ function useChannelEventListener<K extends keyof BroadcastChannelEventMap>(
   event: K,
   handler: (e: BroadcastChannelEventMap[K]) => void = () => {}
 ) {
-  const callbackRef = useRef(handler);
+  const callbackRef = React.useRef(handler);
   if (callbackRef.current !== handler) {
     callbackRef.current = handler;
   }
 
-  useEffect(() => {
-    if (channel) {
-      channel.addEventListener(event, callbackRef.current);
-      return () => channel.removeEventListener(event, callbackRef.current);
+  const listener = React.useCallback(
+    (e: BroadcastChannelEventMap[K]) => callbackRef.current(e),
+    []
+  );
+
+  React.useEffect(() => {
+    if (!channel) {
+      return;
     }
-  }, [channel, event]);
+
+    channel.addEventListener(event, listener);
+    return () => channel.removeEventListener(event, listener);
+  }, [channel, event, listener]);
 }
 
 function createBroadcastChannelGenerator(channelName: string) {

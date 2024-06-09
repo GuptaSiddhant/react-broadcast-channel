@@ -1,6 +1,6 @@
 {
   "name": "use-broadcast-channel",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "React hooks for accessing web broadcast channel.",
   "type": "module",
   "main": "./cjs/index.js",
@@ -8,7 +8,8 @@
   "types": "./esm/index.d.ts",
   "files": [
     "cjs",
-    "esm"
+    "esm",
+    "index.ts"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -51,9 +52,11 @@
     "@types/jest": "^29.5.3",
     "@types/node": "^20.4.8",
     "@types/react": "^18.2.19",
+    "@vitejs/plugin-react": "^4.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vite": "^5.2.13"
   },
   "peerDependencies": {
     "@types/node": ">16",

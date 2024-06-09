@@ -1,9 +1,5 @@
 import * as React from "react";
 
-const NOOP = () => {};
-const NOOP_Subscribe = () => NOOP;
-const nullFn = () => null;
-
 export type BroadcastChannelData =
   | string
   | number
@@ -37,14 +33,10 @@ export function useBroadcastChannel<T extends BroadcastChannelData = string>(
   handleMessage?: (event: MessageEvent) => void,
   handleMessageError?: (event: MessageEvent) => void
 ): (data: T) => void {
-  const getSnapshot = React.useMemo(
-    () => createBroadcastChannelGenerator(channelName + "-channel"),
-    [channelName]
-  );
-  const channel = React.useSyncExternalStore(
-    NOOP_Subscribe,
-    getSnapshot,
-    nullFn
+  const [channel] = React.useState<BroadcastChannel | null>(
+    typeof window !== "undefined" && "BroadcastChannel" in window
+      ? new BroadcastChannel(channelName + "-channel")
+      : null
   );
 
   useChannelEventListener(channel, "message", handleMessage);
@@ -109,31 +101,20 @@ export function useBroadcastState<T extends BroadcastChannelData = string>(
 function useChannelEventListener<K extends keyof BroadcastChannelEventMap>(
   channel: BroadcastChannel | null,
   event: K,
-  handler: (e: BroadcastChannelEventMap[K]) => void = () => {}
+  handler?: (e: BroadcastChannelEventMap[K]) => void
 ) {
   const callbackRef = React.useRef(handler);
   if (callbackRef.current !== handler) {
     callbackRef.current = handler;
   }
 
-  const listener = React.useCallback(
-    (e: BroadcastChannelEventMap[K]) => callbackRef.current(e),
-    []
-  );
-
   React.useEffect(() => {
-    if (!channel) {
+    const callback = callbackRef.current;
+    if (!channel || !callback) {
       return;
     }
 
-    channel.addEventListener(event, listener);
-    return () => channel.removeEventListener(event, listener);
-  }, [channel, event, listener]);
-}
-
-function createBroadcastChannelGenerator(channelName: string) {
-  return () =>
-    typeof window !== "undefined" && "BroadcastChannel" in window
-      ? new BroadcastChannel(channelName + "-channel")
-      : null;
+    channel.addEventListener(event, callback);
+    return () => channel.removeEventListener(event, callback);
+  }, [channel, event]);
 }

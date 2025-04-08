@@ -1,6 +1,6 @@
 {
   "name": "use-broadcast-channel",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "React hooks for accessing web broadcast channel.",
   "type": "module",
   "main": "./cjs/index.js",

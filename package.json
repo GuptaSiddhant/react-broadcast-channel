@@ -62,7 +62,7 @@
     "@types/node": ">16",
     "@types/react": ">17",
     "broadcastchannel-polyfill": "^1.0.0",
-    "react": "^16.8 || 17 || 18 || >19"
+    "react": "^16.8 || 17 || 18 || >=19"
   },
   "peerDependenciesMeta": {
     "@types/node": {

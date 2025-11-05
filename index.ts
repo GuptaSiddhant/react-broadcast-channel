@@ -35,7 +35,7 @@ export function useBroadcastChannel<T extends BroadcastChannelData = string>(
 ): (data: T) => void {
   const [channel] = React.useState<BroadcastChannel | null>(
     typeof window !== "undefined" && "BroadcastChannel" in window
-      ? new BroadcastChannel(channelName + "-channel")
+      ? new BroadcastChannel(channelName)
       : null
   );
 
